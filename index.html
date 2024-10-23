@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christmas Countdown</title>
+    <style>
+        /* Background */
+        body {
+            margin: 0;
+            padding: 0;
+            background: url('https://raw.githubusercontent.com/MichaelH12345/xmas_countdown/main/xmas_countdown_background.png') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Christmas Countdown text */
+        #christmasText {
+            font-family: 'Epicursive Script Regular', cursive;
+            font-size: 150px;
+            color: rgb(188, 47, 34);
+            position: absolute;
+            top: 50px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Image below title */
+        #countdownImage {
+            position: absolute;
+            top: 275px; /* 25px below the title text */
+            height: 90px;
+        }
+
+        /* Countdown container */
+        .countdown-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+        }
+
+        /* Rounded box for each countdown number */
+        .countdown-box {
+            font-family: 'Epicursive Script Regular', cursive;
+            font-size: 150px;
+            color: rgb(255, 255, 255);
+            background-color: rgba(188, 47, 34, 0.8);
+            border-radius: 20px;
+            padding: 20px;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden; /* Mask effect */
+        }
+
+        /* Slide down animation */
+        .countdown-box span {
+            position: absolute;
+            transition: transform 0.75s ease-in-out;
+        }
+
+        /* New number starts above */
+        .countdown-box.slide-down span.new {
+            transform: translateY(-100%);
+        }
+
+        /* Old number slides down */
+        .countdown-box.slide-down span.old {
+            transform: translateY(100%);
+        }
+
+        /* Labels for countdown (Days, Hours, Minutes, Seconds) */
+        .label {
+            font-family: 'Tisa Sans Pro Regular', sans-serif;
+            font-size: 40px;
+            color: rgb(188, 47, 34);
+            text-align: center;
+        }
+
+        /* Merry Christmas text */
+        #merryChristmasText {
+            font-family: 'Tisa Sans Pro Bold', sans-serif;
+            font-size: 50px;
+            color: rgb(188, 47, 34);
+            text-align: center;
+            position: absolute; /* Position it in the center */
+            bottom: 190px; /* Adjust as needed */
+            width: 750px;
+        }
+
+        /* Import font */
+        @font-face {
+            font-family: 'Epicursive Script Regular';
+            src: url('https://raw.githubusercontent.com/MichaelH12345/xmas_countdown/main/Epicursive%20Script%20Regular.ttf') format('truetype');
+        }
+
+        @font-face {
+            font-family: 'Tisa Sans Pro Regular';
+            src: url('https://raw.githubusercontent.com/MichaelH12345/xmas_countdown/main/Tisa%20Sans%20Pro%20Regular.ttf') format('truetype');
+        }
+
+                @font-face {
+            font-family: 'Tisa Sans Pro Bold';
+            src: url('https://raw.githubusercontent.com/MichaelH12345/xmas_countdown/main/Tisa%20Sans%20Pro%20Bold.ttf') format('truetype');
+        }
+    </style>
+</head>
+<body>
+
+    <div id="christmasText">Christmas Countdown</div>
+    
+    <!-- Image added below title -->
+    <img id="countdownImage" src="https://raw.githubusercontent.com/MichaelH12345/xmas_countdown/main/ChristmasIsIn.png" alt="Christmas Is In">
+
+    <div class="countdown-container">
+        <div>
+            <div class="countdown-box" id="days"></div>
+            <div class="label">Days</div>
+        </div>
+        <div>
+            <div class="countdown-box" id="hours"></div>
+            <div class="label">Hours</div>
+        </div>
+        <div>
+            <div class="countdown-box" id="minutes"></div>
+            <div class="label">Minutes</div>
+        </div>
+        <div>
+            <div class="countdown-box" id="seconds"></div>
+            <div class="label">Seconds</div>
+        </div>
+    </div>
+
+    <!-- Added Merry Christmas text -->
+    <div id="merryChristmasText">Merry Christmas from North Oakwood Model Railway</div>
+
+    <script>
+        // Set the date we're counting down to
+        const countDownDate = new Date("Dec 25, 2024 00:00:00").getTime();
+
+        // Store the previous values to detect changes
+        let previousValues = {
+            days: null,
+            hours: null,
+            minutes: null,
+            seconds: null
+        };
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = countDownDate - now;
+
+            // Calculate time remaining
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Update only the boxes where the values have changed
+            if (days !== previousValues.days) {
+                updateBox("days", days);
+                previousValues.days = days;
+            }
+            if (hours !== previousValues.hours) {
+                updateBox("hours", hours);
+                previousValues.hours = hours;
+            }
+            if (minutes !== previousValues.minutes) {
+                updateBox("minutes", minutes);
+                previousValues.minutes = minutes;
+            }
+            if (seconds !== previousValues.seconds) {
+                updateBox("seconds", seconds);
+                previousValues.seconds = seconds;
+            }
+
+            // If the countdown is finished
+            if (distance < 0) {
+                clearInterval(countdownFunction);
+                updateBox("days", 0);
+                updateBox("hours", 0);
+                updateBox("minutes", 0);
+                updateBox("seconds", 0);
+            }
+        }
+
+        function updateBox(id, newValue) {
+            const box = document.getElementById(id);
+            const oldSpan = box.querySelector('span');
+            
+            if (oldSpan) {
+                // Mark current number as old and animate it out
+                oldSpan.classList.remove('new');
+                oldSpan.classList.add('old');
+                
+                // Remove it after the animation completes
+                setTimeout(() => oldSpan.remove(), 800);
+            }
+
+            // Create a new span for the incoming number
+            const newSpan = document.createElement('span');
+            newSpan.textContent = newValue;
+            newSpan.classList.add('new');
+            box.appendChild(newSpan);
+
+            // Add slide-down class to start animation
+            box.classList.add('slide-down');
+            setTimeout(() => {
+                newSpan.classList.remove('new'); // Make it the current visible number
+            }, 10);
+
+            // Remove the animation class after the transition to avoid continuous animation
+            setTimeout(() => box.classList.remove('slide-down'), 800);
+        }
+
+        // Update the countdown every second
+        const countdownFunction = setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
